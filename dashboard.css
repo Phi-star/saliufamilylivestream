@@ -244,6 +244,12 @@ body {
     margin-right: 10px;
 }
 
+.stream-options .stream-btn.full-width {
+    width: 100%;
+    margin-top: 15px;
+    justify-content: center;
+}
+
 #streamSetup {
     width: 100%;
     margin-top: 20px;
@@ -279,9 +285,6 @@ body {
 
 #streamPreview {
     margin-top: 20px;
-    display: none;
-    flex-direction: column;
-    align-items: center;
 }
 
 #livePreview {
@@ -289,27 +292,39 @@ body {
     max-width: 600px;
     background-color: #000;
     border-radius: 10px;
-    margin-bottom: 15px;
+    aspect-ratio: 16/9;
 }
 
 .stream-actions {
     display: flex;
+    justify-content: center;
     gap: 15px;
+    margin-top: 15px;
 }
 
 .go-live-btn {
     background-color: var(--success-color);
     color: white;
     border: none;
-    padding: 10px 25px;
-    border-radius: 20px;
-    cursor: pointer;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 1rem;
     font-weight: 600;
+    cursor: pointer;
     transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .go-live-btn:hover {
     background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.go-live-btn i {
+    font-size: 1.1rem;
 }
 
 .cancel-btn {
@@ -559,20 +574,6 @@ body {
 .no-streams p, .no-friends p, .no-users p {
     color: #666;
     margin-bottom: 20px;
-}
-
-.add-friends-btn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.add-friends-btn:hover {
-    background-color: var(--secondary-color);
 }
 
 /* Stream Modal Styles */
@@ -873,4 +874,4 @@ body {
 /* Utility Classes */
 .hidden {
     display: none !important;
-    }
+        }
