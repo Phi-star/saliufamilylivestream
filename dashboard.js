@@ -5,29 +5,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const userAvatar = document.getElementById('userAvatar');
     const userStatus = document.getElementById('userStatus');
     const startStreamBtn = document.getElementById('startStreamBtn');
+    const streamSetup = document.getElementById('streamSetup');
     const streamPreview = document.getElementById('streamPreview');
     const livePreview = document.getElementById('livePreview');
     const goLiveBtn = document.getElementById('goLiveBtn');
     const cancelStreamBtn = document.getElementById('cancelStreamBtn');
+    const streamTitle = document.getElementById('streamTitle');
+    const streamCategory = document.getElementById('streamCategory');
     const liveStreamsContainer = document.getElementById('liveStreamsContainer');
-    const friendsListContainer = document.getElementById('friendsListContainer');
+    const usersListContainer = document.getElementById('usersListContainer');
     const logoutBtn = document.getElementById('logoutBtn');
     const streamModal = document.getElementById('streamModal');
     const closeStreamBtn = document.querySelector('.close-stream');
     const streamViewer = document.getElementById('streamViewer');
     const streamerName = document.getElementById('streamerName');
+    const streamTitleDisplay = document.getElementById('streamTitleDisplay');
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const sendMessageBtn = document.getElementById('sendMessageBtn');
     const viewerCount = document.getElementById('viewerCount');
+    const onlineCount = document.getElementById('onlineCount');
+    const notificationToast = document.getElementById('notificationToast');
+    const toastMessage = document.getElementById('toastMessage');
+    const notificationCount = document.querySelector('.notification-count');
 
-    // Current user
+    // Current user and stream state
     let currentUser = localStorage.getItem('currentUser');
     let currentStream = null;
-    let stream = null;
+    let mediaStream = null;
     let peerConnection = null;
     let dataChannel = null;
     let viewers = 0;
+    let onlineUsers = 0;
+    let notifications = 0;
+    let allUsers = JSON.parse(localStorage.getItem('users')) || [];
 
     // Initialize the dashboard
     function initDashboard() {
@@ -37,24 +48,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Display user info
-        const user = JSON.parse(localStorage.getItem(currentUser));
+        const user = getUserData(currentUser);
         usernameDisplay.textContent = currentUser;
         welcomeUsername.textContent = currentUser;
         userAvatar.textContent = currentUser.charAt(0).toUpperCase();
         userStatus.textContent = user.isLive ? 'Live Now' : 'Offline';
 
-        // Load live streams
+        // Load initial data
         loadLiveStreams();
+        loadAllUsers();
+        checkForLiveNotifications();
 
-        // Load friends list
-        loadFriendsList();
+        // Set up periodic updates
+        setInterval(loadLiveStreams, 10000); // Refresh live streams every 10 seconds
+        setInterval(updateViewerCount, 5000); // Update viewer count every 5 seconds
     }
 
-    // Load live streams from "database"
+    // Get user data from localStorage
+    function getUserData(username) {
+        return JSON.parse(localStorage.getItem(username)) || { 
+            username: username,
+            friends: [],
+            isLive: false,
+            notifications: []
+        };
+    }
+
+    // Save user data to localStorage
+    function saveUserData(username, data) {
+        localStorage.setItem(username, JSON.stringify(data));
+    }
+
+    // Load live streams from all users
     function loadLiveStreams() {
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        const liveStreams = users
-            .map(username => JSON.parse(localStorage.getItem(username)))
+        const liveStreams = allUsers
+            .map(username => getUserData(username))
             .filter(user => user.isLive && user.username !== currentUser);
 
         if (liveStreams.length === 0) {
@@ -78,11 +106,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="streamer-avatar">${user.username.charAt(0).toUpperCase()}</div>
                         <div class="streamer-name">${user.username}</div>
                     </div>
-                    <h3 class="stream-title">${user.username}'s Live Stream</h3>
-                    <span class="stream-category">Just Chatting</span>
+                    <h3 class="stream-title">${user.streamTitle || `${user.username}'s Live Stream`}</h3>
+                    <span class="stream-category">${user.streamCategory || 'Just Chatting'}</span>
                     <div class="stream-viewers">
                         <i class="fas fa-users"></i>
-                        <span>${Math.floor(Math.random() * 100) + 1} viewers</span>
+                        <span>${user.viewers || 0} viewers</span>
                     </div>
                 </div>
                 <button class="watch-btn">Watch Stream</button>
@@ -98,94 +126,144 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Load friends list
-    function loadFriendsList() {
-        const user = JSON.parse(localStorage.getItem(currentUser));
-        const friends = user.friends || [];
-
-        if (friends.length === 0) {
-            friendsListContainer.innerHTML = `
-                <div class="no-friends">
+    // Load all users (for friends list)
+    function loadAllUsers() {
+        if (allUsers.length <= 1) {
+            usersListContainer.innerHTML = `
+                <div class="no-users">
                     <i class="fas fa-user-friends"></i>
-                    <p>You don't have any friends yet</p>
-                    <button class="add-friends-btn">Add Friends</button>
+                    <p>No other users found</p>
                 </div>
             `;
             return;
         }
 
-        friendsListContainer.innerHTML = friends.map(friend => {
-            const friendData = JSON.parse(localStorage.getItem(friend));
-            return `
-                <div class="friend-card" data-username="${friend}">
-                    <div class="friend-avatar">${friend.charAt(0).toUpperCase()}</div>
-                    <div class="friend-details">
-                        <div class="friend-name">${friend}</div>
-                        <div class="friend-status ${friendData.isLive ? 'online' : ''}">
-                            ${friendData.isLive ? 'Live Now' : 'Offline'}
+        usersListContainer.innerHTML = allUsers
+            .filter(username => username !== currentUser)
+            .map(username => {
+                const user = getUserData(username);
+                const currentUserData = getUserData(currentUser);
+                const isFriend = currentUserData.friends.includes(username);
+                
+                return `
+                    <div class="user-card" data-username="${username}">
+                        <div class="user-avatar">${username.charAt(0).toUpperCase()}</div>
+                        <div class="user-details">
+                            <div class="user-name">${username}</div>
+                            <div class="user-status ${user.isLive ? 'live' : ''}">
+                                ${user.isLive ? 'Live Now' : 'Offline'}
+                            </div>
                         </div>
+                        <button class="add-friend-btn ${isFriend ? 'added' : ''}" 
+                                data-username="${username}">
+                            ${isFriend ? 'Added' : 'Add Friend'}
+                        </button>
                     </div>
-                    <div class="friend-actions">
-                        <button class="friend-btn" title="Message"><i class="fas fa-comment"></i></button>
-                        <button class="friend-btn" title="View Profile"><i class="fas fa-user"></i></button>
-                    </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
 
-        // Add event listeners to friend cards
-        document.querySelectorAll('.friend-card').forEach(card => {
-            const username = card.dataset.username;
-            const friendData = JSON.parse(localStorage.getItem(username));
-            
-            if (friendData.isLive) {
-                card.addEventListener('click', () => watchStream(username));
-            }
+        // Add event listeners to add friend buttons
+        document.querySelectorAll('.add-friend-btn:not(.added)').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const friendUsername = this.dataset.username;
+                addFriend(friendUsername);
+            });
         });
+
+        // Add click handler for live users
+        document.querySelectorAll('.user-card .user-status.live').forEach(status => {
+            status.closest('.user-card').addEventListener('click', function() {
+                const username = this.dataset.username;
+                watchStream(username);
+            });
+        });
+    }
+
+    // Add a friend
+    function addFriend(friendUsername) {
+        const user = getUserData(currentUser);
+        if (!user.friends.includes(friendUsername)) {
+            user.friends.push(friendUsername);
+            saveUserData(currentUser, user);
+            
+            // Update UI
+            const btn = document.querySelector(`.add-friend-btn[data-username="${friendUsername}"]`);
+            btn.textContent = 'Added';
+            btn.classList.add('added');
+            
+            // Send notification to the friend
+            const friend = getUserData(friendUsername);
+            friend.notifications = friend.notifications || [];
+            friend.notifications.push({
+                type: 'friend_request',
+                from: currentUser,
+                message: `${currentUser} added you as a friend`,
+                timestamp: new Date().toISOString(),
+                read: false
+            });
+            saveUserData(friendUsername, friend);
+            
+            showNotification(`${friendUsername} added to your friends list`);
+        }
     }
 
     // Start stream button click handler
     startStreamBtn.addEventListener('click', async function() {
         try {
-            stream = await navigator.mediaDevices.getUserMedia({ 
-                video: true, 
+            // Request camera and microphone access
+            mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    facingMode: 'user'
+                }, 
                 audio: true 
             });
             
-            livePreview.srcObject = stream;
-            streamPreview.classList.remove('hidden');
+            // Show preview
+            livePreview.srcObject = mediaStream;
             startStreamBtn.classList.add('hidden');
+            streamSetup.classList.remove('hidden');
             
-            // Simulate WebRTC connection setup
+            // Set up WebRTC (simulated in this example)
             setupWebRTC();
         } catch (err) {
             console.error('Error accessing media devices:', err);
-            alert('Could not access camera/microphone. Please check permissions.');
+            showNotification('Could not access camera/microphone. Please check permissions.', 'error');
         }
     });
 
     // Go live button click handler
     goLiveBtn.addEventListener('click', function() {
-        // Update user status
-        const user = JSON.parse(localStorage.getItem(currentUser));
-        user.isLive = true;
-        localStorage.setItem(currentUser, JSON.stringify(user));
-        userStatus.textContent = 'Live Now';
+        const title = streamTitle.value.trim() || `${currentUser}'s Live Stream`;
+        const category = streamCategory.value;
         
-        // Create a new stream entry
+        // Update user status
+        const user = getUserData(currentUser);
+        user.isLive = true;
+        user.streamTitle = title;
+        user.streamCategory = category;
+        user.viewers = 0;
+        user.streamStartTime = new Date().toISOString();
+        saveUserData(currentUser, user);
+        
+        // Create current stream object
         currentStream = {
             username: currentUser,
-            title: `${currentUser}'s Live Stream`,
-            category: 'Just Chatting',
+            title: title,
+            category: category,
             viewers: 0,
             startTime: new Date().toISOString()
         };
         
-        // Show success message
-        alert('You are now live!');
+        // Update UI
+        userStatus.textContent = 'Live Now';
+        userStatus.style.color = 'var(--danger-color)';
         
-        // Refresh streams list for other users
-        // In a real app, this would be handled by a server
+        // Notify all users
+        notifyUsersAboutLiveStream();
+        
+        showNotification('You are now live! Your friends have been notified.');
     });
 
     // Cancel stream button click handler
@@ -195,112 +273,279 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Watch a stream
     function watchStream(username) {
-        const streamer = JSON.parse(localStorage.getItem(username));
+        const streamer = getUserData(username);
         
         if (!streamer.isLive) {
-            alert('This user is not currently live.');
+            showNotification('This user is not currently live.', 'error');
             return;
         }
         
+        // Update stream info in modal
         streamerName.textContent = username;
-        viewerCount.textContent = Math.floor(Math.random() * 100) + 1;
+        streamTitleDisplay.textContent = streamer.streamTitle || `${username}'s Stream`;
+        viewerCount.textContent = `${streamer.viewers || 0} viewers`;
         
-        // In a real app, this would connect to the actual stream
-        streamViewer.src = 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
+        // In a real app, this would connect to the actual stream via WebRTC or HLS
+        // For demo purposes, we'll use a placeholder with simulated WebRTC
+        simulateStreamConnection(username);
         
         // Show the modal
-        streamModal.classList.add('show');
+        streamModal.classList.remove('hidden');
         
-        // Simulate chat messages
-        simulateChat();
+        // Update viewer count for the streamer
+        if (streamer.viewers) {
+            streamer.viewers += 1;
+        } else {
+            streamer.viewers = 1;
+        }
+        saveUserData(username, streamer);
+        
+        // Simulate chat and viewers
+        simulateChat(username);
+        simulateViewers(username);
+    }
+
+    // Simulate stream connection (would be WebRTC in real implementation)
+    function simulateStreamConnection(username) {
+        // In a real app, this would set up WebRTC connection to the streamer
+        console.log(`Connecting to ${username}'s stream...`);
+        
+        // For demo, we'll use a placeholder video
+        streamViewer.src = 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
+        streamViewer.play().catch(e => console.error('Error playing stream:', e));
     }
 
     // Close stream modal
     closeStreamBtn.addEventListener('click', function() {
-        streamModal.classList.remove('show');
+        streamModal.classList.add('hidden');
         if (streamViewer.srcObject) {
             streamViewer.srcObject.getTracks().forEach(track => track.stop());
             streamViewer.srcObject = null;
         }
+        streamViewer.src = '';
     });
 
     // Send chat message
-    sendMessageBtn.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendMessage();
-    });
-
     function sendMessage() {
         const message = chatInput.value.trim();
         if (!message) return;
         
         const messageElement = document.createElement('div');
         messageElement.classList.add('chat-message', 'sender');
-        messageElement.textContent = message;
+        messageElement.innerHTML = `
+            <span class="message-sender">You</span>
+            <span class="message-text">${message}</span>
+            <span class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+        `;
         chatMessages.appendChild(messageElement);
         
         chatInput.value = '';
         chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // In a real app, this would send the message to the streamer and other viewers
     }
 
     // Simulate incoming chat messages
-    function simulateChat() {
+    function simulateChat(username) {
+        // Clear any existing interval
+        if (window.chatInterval) clearInterval(window.chatInterval);
+        
         const messages = [
-            "Hey everyone!",
-            "How's it going?",
+            "Hey everyone! How's it going?",
             "This stream is awesome!",
-            "LOL that was funny",
-            "First time watching, loving it!",
-            "Can you play my favorite song?",
+            "LOL that was hilarious",
+            "First time watching, loving the content!",
+            "Can you play my favorite song next?",
             "Greetings from Germany!",
-            "The quality is great!",
-            "How long have you been streaming?",
-            "Thanks for the content!"
+            "The stream quality is great!",
+            "How long have you been streaming today?",
+            "Thanks for the amazing content!",
+            "Just subscribed to your channel!"
         ];
         
-        setInterval(() => {
-            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            const randomUser = ['StreamFan123', 'ViewerPro', 'ChatLover', 'StreamBuddy', 'RandomUser'][Math.floor(Math.random() * 5)];
-            
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('chat-message');
-            messageElement.textContent = `${randomUser}: ${randomMessage}`;
-            chatMessages.appendChild(messageElement);
-            
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+        const users = ['StreamFan123', 'ViewerPro', 'ChatLover', 'StreamBuddy', 'RandomUser'];
+        
+        window.chatInterval = setInterval(() => {
+            if (!streamModal.classList.contains('hidden')) {
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                const randomUser = users[Math.floor(Math.random() * users.length)];
+                const isViewer = Math.random() > 0.7;
+                
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message');
+                if (isViewer) messageElement.classList.add('viewer');
+                
+                messageElement.innerHTML = `
+                    <span class="message-sender">${randomUser}</span>
+                    <span class="message-text">${randomMessage}</span>
+                    <span class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                `;
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         }, 3000);
     }
 
-    // Setup WebRTC (simplified simulation)
-    function setupWebRTC() {
-        console.log('Setting up WebRTC connection...');
-        // In a real app, this would set up peer connections, signaling, etc.
+    // Simulate viewer count updates
+    function simulateViewers(username) {
+        if (window.viewerInterval) clearInterval(window.viewerInterval);
+        
+        let count = parseInt(viewerCount.textContent) || 1;
+        onlineCount.textContent = `${count} online`;
+        
+        window.viewerInterval = setInterval(() => {
+            if (!streamModal.classList.contains('hidden')) {
+                const change = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+                count = Math.max(1, count + change);
+                viewerCount.textContent = `${count} viewers`;
+                onlineCount.textContent = `${count} online`;
+                
+                // Update the streamer's viewer count
+                const streamer = getUserData(username);
+                if (streamer.isLive) {
+                    streamer.viewers = count;
+                    saveUserData(username, streamer);
+                }
+            }
+        }, 5000);
+    }
+
+    // Notify users about live stream
+    function notifyUsersAboutLiveStream() {
+        const user = getUserData(currentUser);
+        const friends = user.friends || [];
+        
+        friends.forEach(friend => {
+            const friendData = getUserData(friend);
+            friendData.notifications = friendData.notifications || [];
+            friendData.notifications.push({
+                type: 'live_stream',
+                from: currentUser,
+                message: `${currentUser} just went live!`,
+                timestamp: new Date().toISOString(),
+                read: false
+            });
+            saveUserData(friend, friendData);
+        });
+        
+        // Update all users list to show who's live
+        allUsers.forEach(username => {
+            if (username !== currentUser) {
+                const userData = getUserData(username);
+                if (userData.notifications) {
+                    userData.notifications.push({
+                        type: 'live_stream',
+                        from: currentUser,
+                        message: `${currentUser} is now live streaming!`,
+                        timestamp: new Date().toISOString(),
+                        read: false
+                    });
+                    saveUserData(username, userData);
+                }
+            }
+        });
+    }
+
+    // Check for live notifications
+    function checkForLiveNotifications() {
+        const user = getUserData(currentUser);
+        const liveNotifications = (user.notifications || [])
+            .filter(n => n.type === 'live_stream' && !n.read)
+            .slice(0, 3); // Show max 3 notifications
+        
+        if (liveNotifications.length > 0) {
+            notifications += liveNotifications.length;
+            notificationCount.textContent = notifications;
+            
+            // Mark as read
+            user.notifications.forEach(n => {
+                if (n.type === 'live_stream') n.read = true;
+            });
+            saveUserData(currentUser, user);
+            
+            // Show notifications
+            liveNotifications.forEach((notification, i) => {
+                setTimeout(() => {
+                    showNotification(notification.message, 'info');
+                }, i * 3000);
+            });
+        }
+    }
+
+    // Show notification toast
+    function showNotification(message, type = 'success') {
+        toastMessage.textContent = message;
+        notificationToast.className = `notification-toast ${type}`;
+        notificationToast.classList.add('show');
+        
+        setTimeout(() => {
+            notificationToast.classList.remove('show');
+        }, 5000);
+    }
+
+    // Update viewer count periodically
+    function updateViewerCount() {
+        if (currentStream) {
+            const user = getUserData(currentUser);
+            if (user.isLive) {
+                // Simulate viewer fluctuation
+                const change = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+                user.viewers = Math.max(0, (user.viewers || 0) + change);
+                saveUserData(currentUser, user);
+            }
+        }
     }
 
     // Stop the stream
     function stopStream() {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
         }
         
         if (currentStream) {
             // Update user status
-            const user = JSON.parse(localStorage.getItem(currentUser));
+            const user = getUserData(currentUser);
             user.isLive = false;
-            localStorage.setItem(currentUser, JSON.stringify(user));
-            userStatus.textContent = 'Offline';
+            user.streamTitle = null;
+            user.streamCategory = null;
+            user.viewers = 0;
+            saveUserData(currentUser, user);
             
             currentStream = null;
+            
+            // Update UI
+            userStatus.textContent = 'Offline';
+            userStatus.style.color = '';
         }
         
+        // Reset stream UI
         livePreview.srcObject = null;
-        streamPreview.classList.add('hidden');
+        streamSetup.classList.add('hidden');
         startStreamBtn.classList.remove('hidden');
+        
+        showNotification('Your live stream has ended.');
+    }
+
+    // Setup WebRTC (simulated)
+    function setupWebRTC() {
+        console.log('Setting up WebRTC connection...');
+        // In a real app, this would:
+        // 1. Create RTCPeerConnection
+        // 2. Set up signaling with a server
+        // 3. Add media tracks
+        // 4. Handle ICE candidates
+        // 5. Set up data channel for chat
     }
 
     // Logout button click handler
     logoutBtn.addEventListener('click', function() {
+        // Stop stream if live
+        if (currentStream) {
+            stopStream();
+        }
+        
         localStorage.removeItem('currentUser');
         window.location.href = 'index.html';
     });
@@ -308,13 +553,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the dashboard
     initDashboard();
 
-    // Simulate viewer count updates
-    setInterval(() => {
-        if (streamModal.classList.contains('show')) {
-            const change = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
-            let current = parseInt(viewerCount.textContent);
-            current = Math.max(1, current + change); // Never go below 1
-            viewerCount.textContent = current;
-        }
-    }, 5000);
+    // Event listeners
+    sendMessageBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
 })
