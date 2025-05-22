@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saliu Family | Live Streaming Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-broadcast-tower"></i>
+                <span>Saliu Family</span>
+            </div>
+            
+            <div class="user-profile">
+                <div class="avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <h3 id="usernameDisplay">Username</h3>
+                    <p id="userStatus">Offline</p>
+                </div>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li class="active"><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-users"></i> Friends</a></li>
+                    <li><a href="#"><i class="fas fa-video"></i> My Streams</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <header class="top-bar">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search streamers...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count">3</span>
+                </div>
+            </header>
+            
+            <div class="content-wrapper">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <h1>Welcome to Your Streaming Dashboard, <span id="welcomeUsername">User</span>!</h1>
+                    <p>Start your live stream and connect with your audience</p>
+                </div>
+                
+                <!-- Stream Controls -->
+                <div class="stream-controls">
+                    <button id="startStreamBtn" class="stream-btn">
+                        <i class="fas fa-video"></i>
+                        <span>Start Live Stream</span>
+                    </button>
+                    <div id="streamPreview" class="hidden">
+                        <video id="livePreview" autoplay muted></video>
+                        <div class="stream-actions">
+                            <button id="goLiveBtn" class="go-live-btn">GO LIVE</button>
+                            <button id="cancelStreamBtn" class="cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Current Live Streams -->
+                <div class="section-title">
+                    <h2>Live Now</h2>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                
+                <div class="live-streams" id="liveStreamsContainer">
+                    <!-- Stream cards will be inserted here by JavaScript -->
+                    <div class="no-streams">
+                        <i class="fas fa-video-slash"></i>
+                        <p>No live streams at the moment</p>
+                    </div>
+                </div>
+                
+                <!-- Friends List -->
+                <div class="section-title">
+                    <h2>Your Friends</h2>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                
+                <div class="friends-list" id="friendsListContainer">
+                    <!-- Friends will be inserted here by JavaScript -->
+                    <div class="no-friends">
+                        <i class="fas fa-user-friends"></i>
+                        <p>You don't have any friends yet</p>
+                        <button class="add-friends-btn">Add Friends</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stream Viewer Modal -->
+    <div class="stream-modal hidden" id="streamModal">
+        <div class="stream-modal-content">
+            <div class="stream-header">
+                <h3 id="streamerName">Streamer Name</h3>
+                <span class="close-stream">&times;</span>
+            </div>
+            <div class="stream-video-container">
+                <video id="streamViewer" autoplay controls></video>
+                <div class="stream-chat">
+                    <div class="chat-messages" id="chatMessages">
+                        <!-- Chat messages will appear here -->
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Type your message..." id="chatInput">
+                        <button id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="stream-viewer-count">
+                <i class="fas fa-users"></i>
+                <span id="viewerCount">0</span> viewers
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+                  </html
