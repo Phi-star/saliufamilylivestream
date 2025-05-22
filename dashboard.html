@@ -47,7 +47,7 @@
                 </div>
                 <div class="notification-bell">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-count">3</span>
+                    <span class="notification-count">0</span>
                 </div>
             </header>
             
@@ -64,11 +64,29 @@
                         <i class="fas fa-video"></i>
                         <span>Start Live Stream</span>
                     </button>
-                    <div id="streamPreview" class="hidden">
-                        <video id="livePreview" autoplay muted></video>
-                        <div class="stream-actions">
-                            <button id="goLiveBtn" class="go-live-btn">GO LIVE</button>
-                            <button id="cancelStreamBtn" class="cancel-btn">Cancel</button>
+                    <div id="streamSetup" class="hidden">
+                        <div class="stream-options">
+                            <div class="form-group">
+                                <label for="streamTitle">Stream Title</label>
+                                <input type="text" id="streamTitle" placeholder="What are you streaming today?">
+                            </div>
+                            <div class="form-group">
+                                <label for="streamCategory">Category</label>
+                                <select id="streamCategory">
+                                    <option value="gaming">Gaming</option>
+                                    <option value="music">Music</option>
+                                    <option value="talk">Just Talking</option>
+                                    <option value="education">Education</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="streamPreview">
+                            <video id="livePreview" autoplay muted></video>
+                            <div class="stream-actions">
+                                <button id="goLiveBtn" class="go-live-btn">GO LIVE</button>
+                                <button id="cancelStreamBtn" class="cancel-btn">Cancel</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -87,18 +105,17 @@
                     </div>
                 </div>
                 
-                <!-- Friends List -->
+                <!-- All Users List -->
                 <div class="section-title">
-                    <h2>Your Friends</h2>
+                    <h2>All Users</h2>
                     <a href="#" class="view-all">View All</a>
                 </div>
                 
-                <div class="friends-list" id="friendsListContainer">
-                    <!-- Friends will be inserted here by JavaScript -->
-                    <div class="no-friends">
+                <div class="users-list" id="usersListContainer">
+                    <!-- All users will be inserted here by JavaScript -->
+                    <div class="no-users">
                         <i class="fas fa-user-friends"></i>
-                        <p>You don't have any friends yet</p>
-                        <button class="add-friends-btn">Add Friends</button>
+                        <p>No other users found</p>
                     </div>
                 </div>
             </div>
@@ -110,11 +127,19 @@
         <div class="stream-modal-content">
             <div class="stream-header">
                 <h3 id="streamerName">Streamer Name</h3>
+                <div class="stream-info">
+                    <span id="streamTitleDisplay">Stream Title</span>
+                    <span id="viewerCount">0 viewers</span>
+                </div>
                 <span class="close-stream">&times;</span>
             </div>
             <div class="stream-video-container">
                 <video id="streamViewer" autoplay controls></video>
                 <div class="stream-chat">
+                    <div class="chat-header">
+                        <h4>Live Chat</h4>
+                        <span id="onlineCount">0 online</span>
+                    </div>
                     <div class="chat-messages" id="chatMessages">
                         <!-- Chat messages will appear here -->
                     </div>
@@ -124,13 +149,24 @@
                     </div>
                 </div>
             </div>
-            <div class="stream-viewer-count">
-                <i class="fas fa-users"></i>
-                <span id="viewerCount">0</span> viewers
+            <div class="stream-actions">
+                <button id="likeStreamBtn"><i class="fas fa-heart"></i> Like</button>
+                <button id="shareStreamBtn"><i class="fas fa-share"></i> Share</button>
+                <button id="reportStreamBtn"><i class="fas fa-flag"></i> Report</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="notification-toast hidden" id="notificationToast">
+        <div class="toast-content">
+            <div class="toast-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="toast-message" id="toastMessage"></div>
         </div>
     </div>
 
     <script src="dashboard.js"></script>
 </body>
-                  </html
+    </html
