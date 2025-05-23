@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saliu Family | Live Streaming Dashboard</title>
+    <title>Saliu Family | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        <link rel="stylesheet" href="dashboard.css">
-    </style>
+    <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -62,47 +60,10 @@
                 
                 <!-- Stream Controls -->
                 <div class="stream-controls">
-                    <button id="startStreamBtn" class="stream-btn">
+                    <a href="live.html" id="startStreamBtn" class="stream-btn">
                         <i class="fas fa-video"></i>
-                        <span>Start Live Stream</span>
-                    </button>
-                    <div id="streamSetup" class="hidden">
-                        <div class="stream-options">
-                            <div class="form-group">
-                                <label for="streamTitle">What are you streaming today?</label>
-                                <input type="text" id="streamTitle" placeholder="Enter your stream title...">
-                            </div>
-                            <div class="form-group">
-                                <label for="streamCategory">Category</label>
-                                <select id="streamCategory">
-                                    <option value="gaming">Gaming</option>
-                                    <option value="music">Music</option>
-                                    <option value="talk">Just Talking</option>
-                                    <option value="education">Education</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <button id="accessCameraBtn" class="stream-btn full-width">
-                                <i class="fas fa-camera"></i>
-                                <span>Access Camera & Start Stream</span>
-                            </button>
-                        </div>
-                        <div id="streamPreview" class="hidden">
-                            <div class="camera-controls">
-                                <button id="switchCameraBtn" class="camera-switch-btn">
-                                    <i class="fas fa-camera-retro"></i> Switch Camera
-                                </button>
-                            </div>
-                            <video id="livePreview" autoplay muted></video>
-                            <div class="stream-actions">
-                                <button id="goLiveBtn" class="go-live-btn">
-                                    <i class="fas fa-broadcast-tower"></i>
-                                    <span>GO LIVE NOW</span>
-                                </button>
-                                <button id="cancelStreamBtn" class="cancel-btn">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
+                        <span>Go Live Now</span>
+                    </a>
                 </div>
                 
                 <!-- Current Live Streams -->
@@ -136,53 +97,16 @@
         </div>
     </div>
 
-    <!-- Stream Viewer Modal -->
-    <div class="stream-modal hidden" id="streamModal">
-        <div class="stream-modal-content">
-            <div class="stream-header">
-                <h3 id="streamerName">Streamer Name</h3>
-                <div class="stream-info">
-                    <span id="streamTitleDisplay">Stream Title</span>
-                    <span id="viewerCount">0 viewers</span>
-                </div>
-                <span class="close-stream">&times;</span>
+    <!-- Notification Toast -->
+    <div class="notification-toast hidden" id="notificationToast">
+        <div class="toast-content">
+            <div class="toast-icon">
+                <i class="fas fa-bell"></i>
             </div>
-            <div class="stream-video-container">
-                <video id="streamViewer" autoplay controls></video>
-                <div class="stream-chat">
-                    <div class="chat-header">
-                        <h4>Live Chat</h4>
-                        <span id="onlineCount">0 online</span>
-                    </div>
-                    <div class="chat-messages" id="chatMessages">
-                        <!-- Chat messages will appear here -->
-                    </div>
-                    <div class="chat-input">
-                        <input type="text" placeholder="Type your message..." id="chatInput">
-                        <button id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class="stream-actions">
-                <button id="likeStreamBtn"><i class="fas fa-heart"></i> Like</button>
-                <button id="shareStreamBtn"><i class="fas fa-share"></i> Share</button>
-                <button id="reportStreamBtn"><i class="fas fa-flag"></i> Report</button>
-            </div>
+            <div class="toast-message" id="toastMessage"></div>
         </div>
     </div>
 
-    <!-- Streaming Controls -->
-    <div id="streamingControls" class="streaming-controls hidden">
-        <button id="stopStreamBtn">
-            <i class="fas fa-stop"></i> Stop Stream
-        </button>
-        <button id="switchCameraBtn" class="streaming">
-            <i class="fas fa-camera-retro"></i> Switch Camera
-        </button>
-    </div>
-
-    <script>
-       <script src="dashboard.js"></script>
-    </script>
+    <script src="dashboard.js"></script>
 </body>
-</html>
+                                                                                   </html
