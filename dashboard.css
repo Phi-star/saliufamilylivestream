@@ -321,72 +321,116 @@ body {
 }
 
 /* Full-screen preview styles */
-video:-webkit-full-screen {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain;
-    background-color: black;
+.live-stream-preview {
+    width: 100%;
+    max-width: 100%;
+    margin: 20px 0;
 }
 
-video:-moz-full-screen {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain;
-    background-color: black;
+.live-stream-preview video {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    border-radius: 0;
+    background-color: #000;
 }
 
-video:fullscreen {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain;
-    background-color: black;
-}
-
-.stream-actions {
+.streaming-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
     display: flex;
-    justify-content: center;
     gap: 15px;
-    margin-top: 15px;
 }
 
-.go-live-btn {
-    background-color: var(--success-color);
-    color: white;
-    border: none;
-    padding: 12px 30px;
+.streaming-controls button {
+    padding: 12px 24px;
     border-radius: 30px;
-    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    border: none;
 }
 
-.go-live-btn:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.go-live-btn i {
-    font-size: 1.1rem;
-}
-
-.cancel-btn {
+#stopStreamBtn {
     background-color: var(--danger-color);
     color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s;
 }
 
-.cancel-btn:hover {
-    background-color: #c82333;
+#switchCameraBtn.streaming {
+    background-color: var(--info-color);
+    color: white;
+}
+
+/* Notification styles */
+.notification-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 350px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.notification-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.notification-toast.success {
+    background-color: var(--success-color);
+}
+
+.notification-toast.error {
+    background-color: var(--danger-color);
+}
+
+.notification-toast.info {
+    background-color: var(--info-color);
+}
+
+.notification-toast .copy-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+}
+
+.notification-toast .copy-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.notification-toast .copy-btn i {
+    font-size: 0.8rem;
+}
+
+.stream-url {
+    font-family: monospace;
+    background: rgba(0,0,0,0.2);
+    padding: 2px 5px;
+    border-radius: 3px;
+    word-break: break-all;
+    display: inline-block;
+    margin-top: 5px;
 }
 
 /* Section Titles */
@@ -810,95 +854,6 @@ video:fullscreen {
     font-size: 1rem;
 }
 
-/* Notification Toast */
-.notification-toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: var(--primary-color);
-    color: white;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1100;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    max-width: 350px;
-    transform: translateY(100px);
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.notification-toast.show {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-.notification-toast.success {
-    background-color: var(--success-color);
-}
-
-.notification-toast.error {
-    background-color: var(--danger-color);
-}
-
-.notification-toast.info {
-    background-color: var(--info-color);
-}
-
-.toast-icon {
-    font-size: 1.5rem;
-}
-
-.toast-message {
-    flex-grow: 1;
-}
-
-/* Watch Page Styles */
-.stream-viewer-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background-color: black;
-}
-
-.stream-viewer-container video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.stream-info {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    color: white;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 10px 15px;
-    border-radius: 5px;
-}
-
-.auth-message {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 30px;
-    border-radius: 10px;
-}
-
-.auth-message a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: bold;
-    margin-top: 15px;
-    display: inline-block;
-}
-
 /* Responsive Styles */
 @media (max-width: 992px) {
     .sidebar {
@@ -965,4 +920,4 @@ video:fullscreen {
 /* Utility Classes */
 .hidden {
     display: none !important;
-}
+    }
