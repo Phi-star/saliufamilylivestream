@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Live | Saliu Family</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="live-stream-container">
+        <div class="stream-header">
+            <h1>You're Live!</h1>
+            <div class="stream-stats">
+                <span id="viewerCount">0 viewers</span>
+                <span id="streamDuration">00:00:00</span>
+            </div>
+        </div>
+        
+        <div class="stream-preview">
+            <video id="livePreview" autoplay muted></video>
+            <div class="stream-controls">
+                <button id="switchCameraBtn" class="control-btn">
+                    <i class="fas fa-camera-retro"></i>
+                    <span>Switch Camera</span>
+                </button>
+                <button id="endStreamBtn" class="control-btn end-btn">
+                    <i class="fas fa-stop"></i>
+                    <span>End Stream</span>
+                </button>
+                <button id="toggleMicBtn" class="control-btn">
+                    <i class="fas fa-microphone"></i>
+                    <span>Mute</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="stream-info">
+            <h2 id="streamTitleDisplay">My Live Stream</h2>
+            <p id="streamCategoryDisplay">Category: Just Chatting</p>
+        </div>
+    </div>
+
+    <script src="live.js"></script>
+</body>
+                  </html
