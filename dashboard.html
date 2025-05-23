@@ -6,7 +6,9 @@
     <title>Saliu Family | Live Streaming Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        /* CSS will be placed here */
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -169,16 +171,18 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div class="notification-toast hidden" id="notificationToast">
-        <div class="toast-content">
-            <div class="toast-icon">
-                <i class="fas fa-bell"></i>
-            </div>
-            <div class="toast-message" id="toastMessage"></div>
-        </div>
+    <!-- Streaming Controls -->
+    <div id="streamingControls" class="streaming-controls hidden">
+        <button id="stopStreamBtn">
+            <i class="fas fa-stop"></i> Stop Stream
+        </button>
+        <button id="switchCameraBtn" class="streaming">
+            <i class="fas fa-camera-retro"></i> Switch Camera
+        </button>
     </div>
 
-    <script src="dashboard.js"></script>
+    <script>
+        // JavaScript will be placed here
+    </script>
 </body>
-                </html
+                    </html
