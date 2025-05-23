@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Live Stream | Saliu Family</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="watch.css">
+</head>
+<body>
+    <div class="stream-viewer-container">
+        <video id="streamPlayer" autoplay controls></video>
+        
+        <div class="stream-info-overlay">
+            <h2 id="streamTitle"></h2>
+            <p id="streamerName"></p>
+            <div class="viewer-count">
+                <i class="fas fa-users"></i>
+                <span id="viewerCount">0 viewers</span>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input">
+                <input type="text" placeholder="Type your message..." id="chatInput">
+                <button id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        
+        <div class="auth-message hidden" id="authMessage">
+            <h3>Login Required</h3>
+            <p>You need to be logged in to watch this stream</p>
+            <a href="index.html">Go to Login Page</a>
+        </div>
+    </div>
+
+    <script src="watch.js"></script>
+</body>
+              </html>
