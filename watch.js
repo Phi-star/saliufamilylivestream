@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const sendMessageBtn = document.getElementById('sendMessageBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
 
     // Check authentication
     if (!currentUser) {
@@ -39,12 +40,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // Simulate loading the stream
     function loadStream() {
         // In a real app, you would connect to the actual stream here
-        // For demo purposes, we're using a sample video
         streamPlayer.src = 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
         streamPlayer.play().catch(e => console.error('Error playing stream:', e));
     }
 
     loadStream();
+
+    // Fullscreen functionality
+    function setupFullscreen() {
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // Change icon based on fullscreen state
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+            } else {
+                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            }
+        });
+    }
+
+    setupFullscreen();
 
     // Simulate viewer count updates
     function simulateViewers() {
@@ -71,42 +97,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     simulateViewers();
 
-    // Chat functionality
+    // Chat functionality (without random messages)
     function setupChat() {
-        const messages = [
-            "Hey everyone! How's it going?",
-            "This stream is awesome!",
-            "LOL that was hilarious",
-            "First time watching, loving the content!",
-            "Can you play my favorite song next?",
-            "Greetings from Germany!",
-            "The stream quality is great!",
-            "How long have you been streaming today?",
-            "Thanks for the amazing content!",
-            "Just subscribed to your channel!"
-        ];
-        
-        const users = ['StreamFan123', 'ViewerPro', 'ChatLover', 'StreamBuddy', 'RandomUser'];
-        
-        // Simulate incoming chat messages
-        setInterval(() => {
-            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            const randomUser = users[Math.floor(Math.random() * users.length)];
-            const isViewer = Math.random() > 0.7;
-            
-            addChatMessage(randomUser, randomMessage, isViewer);
-        }, 3000);
-
         // Handle sending messages
         function sendMessage() {
             const message = chatInput.value.trim();
             if (!message) return;
             
-            addChatMessage('You', message, false, true);
+            addChatMessage('You', message, true);
             chatInput.value = '';
         }
 
-        function addChatMessage(sender, text, isViewer = false, isSender = false) {
+        function addChatMessage(sender, text, isSender = false) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('chat-message');
             if (isSender) messageElement.classList.add('sender');
@@ -128,4 +130,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     setupChat();
-});
+})
