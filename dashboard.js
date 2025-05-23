@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const sendMessageBtn = document.getElementById('sendMessageBtn');
     const viewerCount = document.getElementById('viewerCount');
     const onlineCount = document.getElementById('onlineCount');
-    const notificationToast = document.getElementById('notificationToast');
-    const toastMessage = document.getElementById('toastMessage');
     const notificationCount = document.querySelector('.notification-count');
+    const stopStreamBtn = document.getElementById('stopStreamBtn');
+    const streamingControls = document.getElementById('streamingControls');
 
     // Current user and stream state
     let currentUser = localStorage.getItem('currentUser');
@@ -322,16 +322,14 @@ document.addEventListener('DOMContentLoaded', function() {
             streamKey: user.streamKey
         };
         
-        // Enter full-screen mode for the preview
-        if (livePreview.requestFullscreen) {
-            livePreview.requestFullscreen().catch(err => {
-                console.error('Error attempting to enable fullscreen:', err);
-            });
-        } else if (livePreview.webkitRequestFullscreen) {
-            livePreview.webkitRequestFullscreen();
-        } else if (livePreview.msRequestFullscreen) {
-            livePreview.msRequestFullscreen();
-        }
+        // Make the preview larger
+        streamPreview.classList.add('live-stream-preview');
+        livePreview.style.maxWidth = '100%';
+        livePreview.style.maxHeight = '80vh';
+        livePreview.style.borderRadius = '0';
+        
+        // Show streaming controls
+        streamingControls.classList.remove('hidden');
         
         // Update UI
         updateUserStatus(true);
@@ -340,20 +338,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // Notify all users
         notifyUsersAboutLiveStream();
         
-        // Generate and show the stream link (for demo purposes)
-        const streamLink = `${window.location.origin}/watch.html?stream=${currentUser}&key=${user.streamKey}`;
-        console.log('Stream link (for testing):', streamLink);
-        showNotification(`You are now live! Stream URL: ${streamLink}`, 'success');
+        // Generate and show the stream link
+        const streamLink = `${window.location.origin}/watch.html?stream=${encodeURIComponent(currentUser)}&key=${user.streamKey}`;
+        showNotification(`You are now live!<br>Stream URL: <span class="stream-url">${streamLink}</span>`, 'success');
         
-        // Reset the stream setup UI
-        streamSetup.classList.add('hidden');
-        startStreamBtn.classList.remove('hidden');
+        // Reset the title input
         streamTitle.value = '';
     });
+
+    // Stop stream button click handler
+    stopStreamBtn.addEventListener('click', stopStream);
 
     // Cancel stream button click handler
     cancelStreamBtn.addEventListener('click', function() {
         stopStream();
+        startStreamBtn.classList.remove('hidden');
     });
 
     // Watch a stream
@@ -376,7 +375,6 @@ document.addEventListener('DOMContentLoaded', function() {
         viewerCount.textContent = `${streamer.viewers || 0} viewers`;
         
         // In a real app, this would connect to the actual stream via WebRTC or HLS
-        // For demo purposes, we'll use a placeholder with simulated WebRTC
         simulateStreamConnection(username);
         
         // Show the modal
@@ -544,12 +542,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Show notification toast
     function showNotification(message, type = 'success') {
-        toastMessage.textContent = message;
-        notificationToast.className = `notification-toast ${type}`;
-        notificationToast.classList.add('show');
+        // Create notification container
+        const notification = document.createElement('div');
+        notification.className = `notification-toast ${type} show`;
         
+        // Add message
+        const messageEl = document.createElement('div');
+        messageEl.className = 'toast-message';
+        messageEl.innerHTML = message;
+        notification.appendChild(messageEl);
+        
+        // If it's a stream URL notification, add copy button
+        if (type === 'success' && message.includes('Stream URL:')) {
+            const url = message.split('Stream URL: ')[1].split('<')[0];
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(url).then(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                    }, 2000);
+                });
+            });
+            notification.appendChild(copyBtn);
+        }
+        
+        // Add to DOM
+        document.body.appendChild(notification);
+        
+        // Auto-remove after delay
         setTimeout(() => {
-            notificationToast.classList.remove('show');
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
         }, 5000);
     }
 
@@ -589,13 +615,16 @@ document.addEventListener('DOMContentLoaded', function() {
             updateUserStatus(false);
         }
         
-        // Reset stream UI
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        }
-        livePreview.srcObject = null;
-        streamSetup.classList.add('hidden');
-        streamPreview.classList.add('hidden');
+        // Reset the preview styling
+        const previewContainer = document.getElementById('streamPreview');
+        previewContainer.classList.remove('live-stream-preview');
+        const livePreview = document.getElementById('livePreview');
+        livePreview.style.maxWidth = '';
+        livePreview.style.maxHeight = '';
+        livePreview.style.borderRadius = '';
+        
+        // Hide streaming controls and show setup
+        streamingControls.classList.add('hidden');
         startStreamBtn.classList.remove('hidden');
         streamTitle.value = '';
         
@@ -621,4 +650,4 @@ document.addEventListener('DOMContentLoaded', function() {
     chatInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') sendMessage();
     });
-});
+})
