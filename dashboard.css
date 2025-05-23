@@ -287,12 +287,37 @@ body {
     margin-top: 20px;
 }
 
+.camera-controls {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.camera-switch-btn {
+    background-color: var(--info-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.camera-switch-btn:hover {
+    background-color: #138496;
+}
+
 #livePreview {
     width: 100%;
     max-width: 600px;
     background-color: #000;
     border-radius: 10px;
     aspect-ratio: 16/9;
+    display: block;
+    margin: 0 auto;
 }
 
 .stream-actions {
@@ -874,4 +899,4 @@ body {
 /* Utility Classes */
 .hidden {
     display: none !important;
-        }
+                                }
